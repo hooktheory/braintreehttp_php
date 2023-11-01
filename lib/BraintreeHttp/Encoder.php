@@ -27,11 +27,16 @@ class Encoder
 
     public function serializeRequest(HttpRequest $request)
     {
-        if (!array_key_exists('Content-Type', $request->headers)) {
+
+        // CA modifying
+        $headers = $request->headers;
+        $headers = array_change_key_case($headers, CASE_LOWER);
+
+        if (!array_key_exists('content-type', $request->headers)) {
             throw new \Exception("HttpRequest does not have Content-Type header set");
         }
 
-        $contentType = $request->headers['Content-Type'];
+        $contentType = $request->headers['content-type'];
         /** @var Serializer $serializer */
         $serializer = $this->serializer($contentType);
 
@@ -54,11 +59,14 @@ class Encoder
 
     public function deserializeResponse($responseBody, $headers)
     {
-        if (!array_key_exists('Content-Type', $headers)) {
+        // CA modifying
+        $headers = array_change_key_case($headers, CASE_LOWER);
+
+        if (!array_key_exists('content-type', $headers)) {
             throw new \Exception("HTTP response does not have Content-Type header set");
         }
 
-        $contentType = $headers['Content-Type'];
+        $contentType = $headers['content-type'];
         /** @var Serializer $serializer */
         $serializer = $this->serializer($contentType);
 
