@@ -1,5 +1,5 @@
 {
-    "name": "hooktheory/braintreehttp",
+    "name": "braintree/braintreehttp",
     "type": "library",
     "license": "MIT",
     "authors": [
