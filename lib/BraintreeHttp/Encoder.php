@@ -27,11 +27,16 @@ class Encoder
 
     public function serializeRequest(HttpRequest $request)
     {
-        if (!array_key_exists('Content-Type', $request->headers)) {
+
+        // CA modifying
+        $headers = $request->headers;
+        $headers = array_change_key_case($headers, CASE_LOWER);
+
+        if (!array_key_exists('content-type', $headers)) {
             throw new \Exception("HttpRequest does not have Content-Type header set");
         }
 
-        $contentType = $request->headers['Content-Type'];
+        $contentType = $headers['content-type'];
         /** @var Serializer $serializer */
         $serializer = $this->serializer($contentType);
 
@@ -45,7 +50,7 @@ class Encoder
 
         $serialized = $serializer->encode($request);
 
-        if (array_key_exists("Content-Encoding", $request->headers) && $request->headers["Content-Encoding"] === "gzip") {
+        if (array_key_exists("content-encoding", $headers) && $headers["content-encoding"] === "gzip") {
             $serialized = gzencode($serialized);
         }
 
@@ -54,11 +59,14 @@ class Encoder
 
     public function deserializeResponse($responseBody, $headers)
     {
-        if (!array_key_exists('Content-Type', $headers)) {
+        // CA modifying
+        $headers = array_change_key_case($headers, CASE_LOWER);
+
+        if (!array_key_exists('content-type', $headers)) {
             throw new \Exception("HTTP response does not have Content-Type header set");
         }
 
-        $contentType = $headers['Content-Type'];
+        $contentType = $headers['content-type'];
         /** @var Serializer $serializer */
         $serializer = $this->serializer($contentType);
 
@@ -66,7 +74,7 @@ class Encoder
             throw new \Exception(sprintf("Unable to deserialize response with Content-Type: %s. Supported encodings are: %s", $contentType, implode(", ", $this->supportedEncodings())));
         }
 
-        if (array_key_exists("Content-Encoding", $headers) && $headers["Content-Encoding"] === "gzip") {
+        if (array_key_exists("content-encoding", $headers) && $headers["content-encoding"] === "gzip") {
             $responseBody = gzdecode($responseBody);
         }
 
